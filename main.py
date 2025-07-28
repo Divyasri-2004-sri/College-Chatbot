@@ -46,10 +46,10 @@ async def predict(question: Question):
             headers={
                 "Authorization": f"Bearer {API_KEY}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "http://localhost"  # Required by OpenRouter
+                "HTTP-Referer": "http://localhost"  # Adjust this if needed
             },
             json={
-                "model": "mistralai/mistral-7b-instruct",  # or another available model
+                "model": "mistralai/mistral-7b-instruct",
                 "messages": [
                     {
                         "role": "system",
@@ -65,7 +65,13 @@ async def predict(question: Question):
         )
 
         result = response.json()
-        answer = result["choices"][0]["message"]["content"].strip()
+
+        if "choices" in result:
+            answer = result["choices"][0]["message"]["content"].strip()
+        else:
+            error_detail = result.get("error", "No valid response from OpenRouter.")
+            answer = f"Error from OpenRouter: {error_detail}"
+
     except Exception as e:
         answer = f"Error: {str(e)}"
 
