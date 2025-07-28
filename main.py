@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+# Load college_info.txt content
+try:
+    with open("college_info.txt", "r", encoding="utf-8") as f:
+        COLLEGE_INFO = f.read()
+except FileNotFoundError:
+    COLLEGE_INFO = "College information not available."
+
 # FastAPI app setup
 app = FastAPI()
 
@@ -44,7 +51,14 @@ async def predict(question: Question):
             json={
                 "model": "mistralai/mistral-7b-instruct",  # or another available model
                 "messages": [
-                    {"role": "system", "content": "You are a helpful college assistant."},
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a helpful assistant for a college chatbot. "
+                            "Use the following information about the college to help answer questions:\n\n"
+                            f"{COLLEGE_INFO}"
+                        )
+                    },
                     {"role": "user", "content": user_input}
                 ]
             }
